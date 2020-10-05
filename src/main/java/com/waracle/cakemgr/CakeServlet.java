@@ -90,7 +90,8 @@ public class CakeServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         Session session = HibernateUtil.getSessionFactory().openSession();
-        List<CakeEntity> list = session.createCriteria(CakeEntity.class).list();
+        @SuppressWarnings("unchecked")
+		List<CakeEntity> list = session.createCriteria(CakeEntity.class).list();
 
         resp.getWriter().println("[");
 
