@@ -1,4 +1,4 @@
-package com.waracle.cakemgr;
+package scot.ianmacdonald.cakemgr.webapp;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;

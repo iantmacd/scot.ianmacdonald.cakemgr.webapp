@@ -1,4 +1,4 @@
-package com.waracle.cakemgr;
+package scot.ianmacdonald.cakemgr.webapp;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
