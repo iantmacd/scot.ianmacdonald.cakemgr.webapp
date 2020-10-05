@@ -1,4 +1,4 @@
-package scot.ianmacdonald.cakemgr.webapp;
+package scot.ianmacdonald.cakemgr.webapp.controller;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
