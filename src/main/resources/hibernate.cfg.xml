@@ -12,6 +12,6 @@
         <property name="hibernate.connection.password"></property>
         <property name="hibernate.connection.url">jdbc:hsqldb:mem:db</property>
         <property name="hibernate.hbm2ddl.auto">create</property>
-        <mapping class="scot.ianmacdonald.cakemgr.webapp.CakeEntity"></mapping>
+        <mapping class="scot.ianmacdonald.cakemgr.webapp.model.CakeEntity"></mapping>
     </session-factory>
 </hibernate-configuration>

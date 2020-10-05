@@ -3,6 +3,10 @@ package scot.ianmacdonald.cakemgr.webapp;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+
+import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
+import scot.ianmacdonald.cakemgr.webapp.model.HibernateUtil;
+
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 

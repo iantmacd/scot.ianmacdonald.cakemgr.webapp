@@ -1,4 +1,4 @@
-package scot.ianmacdonald.cakemgr.webapp;
+package scot.ianmacdonald.cakemgr.webapp.model;
 
 import java.io.Serializable;
 

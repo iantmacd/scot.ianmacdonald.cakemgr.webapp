@@ -1,4 +1,4 @@
-package scot.ianmacdonald.cakemgr.webapp;
+package scot.ianmacdonald.cakemgr.webapp.model;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
