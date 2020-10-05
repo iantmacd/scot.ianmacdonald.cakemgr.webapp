@@ -92,6 +92,7 @@ public class CakeServlet extends HttpServlet {
         Session session = HibernateUtil.getSessionFactory().openSession();
         @SuppressWarnings("unchecked")
 		List<CakeEntity> list = session.createCriteria(CakeEntity.class).list();
+        session.close();
 
         resp.getWriter().println("[");
 
