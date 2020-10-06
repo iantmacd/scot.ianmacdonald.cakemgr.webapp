@@ -11,8 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import scot.ianmacdonald.cakemgr.webapp.model.CakeDAO;
+import scot.ianmacdonald.cakemgr.webapp.model.CakeDAOFactory;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
-import scot.ianmacdonald.cakemgr.webapp.model.HibernateCakeDAO;
 
 @WebServlet(urlPatterns = {"/cakes", "/"})
 public class CakeServlet extends HttpServlet {
@@ -27,10 +27,9 @@ public class CakeServlet extends HttpServlet {
 
 		/*
 		 * Obtain a reference to a CakeDAO Interface
-		 * TODO: implement an abstracted lookup mechanism to hide the implementation from this class
 		 * TODO: improve Exception handling (generally)
 		 */
-		CakeDAO cakeDAO = new HibernateCakeDAO();
+		CakeDAO cakeDAO = CakeDAOFactory.getCakeDAO();
 		List<CakeEntity> list = cakeDAO.readAllCakes();
 		
 		if (req.getRequestURI().equals("/cakes")) {
