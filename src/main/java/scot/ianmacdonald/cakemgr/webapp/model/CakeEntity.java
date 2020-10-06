@@ -52,5 +52,18 @@ public class CakeEntity implements Serializable {
     public void setImage(String image) {
         this.image = image;
     }
+    
+    /*
+     * Compare CakeEntity objects by value
+     */
+    @Override
+    public boolean equals(Object other) {
+    	if (other instanceof CakeEntity) {
+    		return title.equals(((CakeEntity)other).title)
+    				&& description.equals(((CakeEntity)other).description)
+    				&& image.equals(((CakeEntity)other).image);
+    	}
+    	else return false;
+    }
 
 }
