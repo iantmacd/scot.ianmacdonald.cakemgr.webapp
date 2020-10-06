@@ -5,6 +5,12 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.service.ServiceRegistry;
 
+/**
+ * A utility class giving Singleton access to a org.hibernate.SessionFactory
+ * configured for use with a lightweight in-memory DB.
+ * @author ian.macdonald@ianmacdonald.scot
+ *
+ */
 public class HibernateUtil {
 
     private static SessionFactory sessionFactory = buildSessionFactory();
