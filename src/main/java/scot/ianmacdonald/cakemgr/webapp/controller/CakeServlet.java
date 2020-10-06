@@ -30,7 +30,7 @@ public class CakeServlet extends HttpServlet {
 		 * TODO: improve Exception handling (generally)
 		 */
 		CakeDAO cakeDAO = CakeDAOFactory.getCakeDAO();
-		List<CakeEntity> list = cakeDAO.readAllCakes();
+		List<CakeEntity> list = cakeDAO.readAll();
 		
 		if (req.getRequestURI().equals("/cakes")) {
 

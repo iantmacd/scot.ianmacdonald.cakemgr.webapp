@@ -10,6 +10,6 @@ import java.util.List;
  */
 public interface CakeDAO {
 	
-	public List<CakeEntity> readAllCakes();
+	public List<CakeEntity> readAll();
 
 }

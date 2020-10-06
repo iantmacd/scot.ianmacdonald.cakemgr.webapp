@@ -100,7 +100,7 @@ public class HibernateCakeDAO implements CakeDAO {
 	}
 	
 	@Override
-	public List<CakeEntity> readAllCakes() {
+	public List<CakeEntity> readAll() {
 		
 		Session session = HibernateUtil.getSessionFactory().openSession();
 		@SuppressWarnings("unchecked")
