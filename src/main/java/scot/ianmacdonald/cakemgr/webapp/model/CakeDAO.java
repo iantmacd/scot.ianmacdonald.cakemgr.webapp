@@ -10,6 +10,14 @@ import java.util.List;
  */
 public interface CakeDAO {
 	
+	/*
+	 * Read all the CakeEntity objects stored in the DB
+	 */
 	public List<CakeEntity> readAll();
+	
+	/*
+	 * Create a new CakeEntity entry in the DB
+	 */
+	public CakeEntity create(CakeEntity cakeEntity);
 
 }

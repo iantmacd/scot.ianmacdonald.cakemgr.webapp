@@ -66,22 +66,7 @@ public class HibernateCakeDAO implements CakeDAO {
 					System.out.println(parser.nextFieldName());
 					cakeEntity.setImage(parser.nextTextValue());
 
-					Session session = HibernateUtil.getSessionFactory().openSession();
-					try {
-						session.beginTransaction();
-						session.persist(cakeEntity);
-						System.out.println("adding cake entity");
-						session.getTransaction().commit();
-					} catch (ConstraintViolationException ex) {
-						/*
-						 * Silently catching Exceptions is generally not good practice, but since
-						 * 1. The data source for this exercise is given as canonical
-						 * 2. It contains duplicates
-						 * 3. The uniqueness constraints on the DB table appear to be intentional
-						 * it is assumed duplicates can be ignored on initialisation of the DB.
-						 */
-					}
-					session.close();
+					create(cakeEntity);
 
 					nextToken = parser.nextToken();
 					System.out.println(nextToken);
@@ -107,6 +92,29 @@ public class HibernateCakeDAO implements CakeDAO {
 		List<CakeEntity> list = session.createCriteria(CakeEntity.class).list();
 		session.close();
 		return list;
+	}
+
+	@Override
+	public CakeEntity create(CakeEntity cakeEntity) {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		try {
+			session.beginTransaction();
+			session.persist(cakeEntity);
+			System.out.println("adding cake entity");
+			session.getTransaction().commit();
+		} catch (ConstraintViolationException ex) {
+			/*
+			 * Silently catching Exceptions is generally not good practice, but since
+			 * 1. The data source for this exercise is given as canonical
+			 * 2. It contains duplicates
+			 * 3. The uniqueness constraints on the DB table appear to be intentional
+			 * it is assumed duplicates can be ignored on initialisation of the DB, but
+			 * should not be when creating new entries purposefully.
+			 * TODO: introduce error handling for uniqueness constraint violation.
+			 */
+		}
+		session.close();
+		return cakeEntity;
 	}
 
 }
