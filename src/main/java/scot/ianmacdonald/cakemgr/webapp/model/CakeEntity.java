@@ -4,8 +4,13 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+/**
+ * Model POJO representing a DB entry for a type of Cake
+ * @author ian.macdonald@ianmacdonald.scot
+ * 
+ */
 @Entity
-@Table(name = "Employee", uniqueConstraints = {@UniqueConstraint(columnNames = "ID"), @UniqueConstraint(columnNames = "EMAIL")})
+@Table(name = "Cake", uniqueConstraints = {@UniqueConstraint(columnNames = "ID"), @UniqueConstraint(columnNames = "TITLE")})
 public class CakeEntity implements Serializable {
 
     private static final long serialVersionUID = -1798070786993154676L;
@@ -13,15 +18,15 @@ public class CakeEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID", unique = true, nullable = false)
-    private Integer employeeId;
+    private Integer id;
 
-    @Column(name = "EMAIL", unique = true, nullable = false, length = 100)
+    @Column(name = "TITLE", unique = true, nullable = false, length = 100)
     private String title;
 
-    @Column(name = "FIRST_NAME", unique = false, nullable = false, length = 100)
+    @Column(name = "DESCRIPTION", unique = false, nullable = false, length = 100)
     private String description;
 
-    @Column(name = "LAST_NAME", unique = false, nullable = false, length = 300)
+    @Column(name = "IMAGE", unique = false, nullable = false, length = 300)
     private String image;
 
     public String getTitle() {
