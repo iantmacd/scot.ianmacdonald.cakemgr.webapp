@@ -38,7 +38,7 @@ public class CakeServlet extends HttpServlet {
 
 		if (request.getRequestURI().equals("/cakes")) {
 
-			response.getWriter().print(CakeEntityJsonTranslator.cakeEntityListToJson(list));
+			response.getWriter().print(PojoJsonTranslator.pojoListToJson(list));
 
 		} else if (request.getRequestURI().equals("/")) {
 
@@ -75,13 +75,13 @@ public class CakeServlet extends HttpServlet {
 			}
 
 			// create a CakeEntity from the JSON
-			final CakeEntity cakeEntity = CakeEntityJsonTranslator.jsonToCakeEntity(cakeJsonBuffer.toString());
+			final CakeEntity cakeEntity = PojoJsonTranslator.jsonToPojo(cakeJsonBuffer.toString(), CakeEntity.class);
 
 			// create the cake in the DB
 			final CakeEntity savedCakeEntity = cakeDAO.create(cakeEntity);
 
 			// output the DB content back to the client in the http response
-			response.getWriter().print(CakeEntityJsonTranslator.cakeEntityToJson(savedCakeEntity));
+			response.getWriter().print(PojoJsonTranslator.pojoToJson(savedCakeEntity));
 
 		} else if (request.getRequestURI().equals("/")) {
 

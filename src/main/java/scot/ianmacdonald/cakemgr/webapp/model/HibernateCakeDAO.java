@@ -14,7 +14,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.service.ServiceRegistry;
 
-import scot.ianmacdonald.cakemgr.webapp.controller.CakeEntityJsonTranslator;
+import scot.ianmacdonald.cakemgr.webapp.controller.PojoJsonTranslator;
 
 /**
  * A concrete implementation of the CakeDAO interface for use with a Hibernate
@@ -79,7 +79,7 @@ public class HibernateCakeDAO implements CakeDAO {
 				// translate the cake json into List<CakeEntity>
 				System.out.println("Translating cake json to Java");
 
-				List<CakeEntity> cakeList = CakeEntityJsonTranslator.jsonToCakeEntityList(buffer.toString());
+				List<CakeEntity> cakeList = PojoJsonTranslator.jsonToPojoList(buffer.toString(), CakeEntity[].class);
 				cakeList.forEach(x -> create(x));
 
 			} catch (Exception ex) {

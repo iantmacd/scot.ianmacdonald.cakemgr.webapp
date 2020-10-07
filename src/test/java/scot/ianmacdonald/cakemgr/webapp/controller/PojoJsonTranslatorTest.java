@@ -13,7 +13,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import junit.framework.Assert;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
 
-public class CakeEntityJsonTranslatorTest {
+public class PojoJsonTranslatorTest {
 	
 	// common test data
 	private final String lemonCheeseCakeJson = "{\n"
@@ -38,41 +38,40 @@ public class CakeEntityJsonTranslatorTest {
 	private final CakeEntity bananaCake = new CakeEntity(null, "Banana cake", "Donkey kongs favourite", "http://ukcdn.ar-cdn.com/recipes/xlarge/ff22df7f-dbcd-4a09-81f7-9c1d8395d936.jpg");
 
 	@Test
-	public void testJsonToCakeEntity() throws JsonParseException, JsonMappingException, IOException {
+	public void testJsonToPojo() throws JsonParseException, JsonMappingException, IOException {
 
 		// create expected result
 		final CakeEntity expectedValue = lemonCheeseCake;
 
 		// get actual result
-		final CakeEntity actualValue = CakeEntityJsonTranslator.jsonToCakeEntity(lemonCheeseCakeJson);
+		final CakeEntity actualValue = PojoJsonTranslator.jsonToPojo(lemonCheeseCakeJson, CakeEntity.class);
 
 		// compare the results
 		Assert.assertEquals("The two CakeEntity objects were not equal by value", expectedValue, actualValue);
 	}
-
+	
 	@Test
-	public void testJsonToCakeEntityList() throws JsonParseException, JsonMappingException, IOException {
-
+	public void testJsonToPojoList() throws JsonParseException, JsonMappingException, IOException {
 		// create expected result
 		final List<CakeEntity> expectedValue = new ArrayList<>();
 		expectedValue.add(lemonCheeseCake);
 		expectedValue.add(bananaCake);
 
 		// get actual result
-		final List<CakeEntity> actualValue = CakeEntityJsonTranslator.jsonToCakeEntityList(cakeListJson);
+		final List<CakeEntity> actualValue = PojoJsonTranslator.jsonToPojoList(cakeListJson, CakeEntity[].class);
 
 		// compare the results
 		Assert.assertEquals("The two CakeEntity lists were not equal by value", expectedValue, actualValue);
 	}
 	
 	@Test
-	public void testCakeEntityToJson() throws JsonProcessingException {
+	public void testPojoToJson() throws JsonProcessingException {
 		
 		// create expected result
 		final String expectedValue = lemonCheeseCakeJson;
 		
 		// get actual result
-		final String actualValue = CakeEntityJsonTranslator.cakeEntityToJson(lemonCheeseCake);
+		final String actualValue = PojoJsonTranslator.pojoToJson(lemonCheeseCake);
 		
 		// compare the results
 		Assert.assertEquals("The two JSON strings were not equal by value", expectedValue, actualValue);
@@ -80,7 +79,7 @@ public class CakeEntityJsonTranslatorTest {
 	}
 	
 	@Test
-	public void testCakeEntityListToJson() throws JsonProcessingException {
+	public void testPojoListToJson() throws JsonProcessingException {
 		
 		// create expected result
 		final String expectedValue = cakeListJson;
@@ -89,7 +88,7 @@ public class CakeEntityJsonTranslatorTest {
 		final List<CakeEntity> listToConvert = new ArrayList<>();
 		listToConvert.add(lemonCheeseCake);
 		listToConvert.add(bananaCake);
-		final String actualValue = CakeEntityJsonTranslator.cakeEntityListToJson(listToConvert);
+		final String actualValue = PojoJsonTranslator.pojoListToJson(listToConvert);
 		
 		// compare the results
 		Assert.assertEquals("The two JSON strings were not equal by value", expectedValue, actualValue);
