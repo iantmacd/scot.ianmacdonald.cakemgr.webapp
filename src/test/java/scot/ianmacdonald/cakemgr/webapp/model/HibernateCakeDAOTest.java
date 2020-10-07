@@ -48,7 +48,7 @@ public class HibernateCakeDAOTest {
 		}
 		
 		// create the CakeEntity we are going to add to the DB
-		CakeEntity banoffeePie = createCakeEntity("Banoffee Pie", "Is it banana or toffee?  Who can tell?",
+		CakeEntity banoffeePie = new CakeEntity(null, "Banoffee Pie", "Is it banana or toffee?  Who can tell?",
 				"https://www.bakedbyanintrovert.com/wp-content/uploads/2019/02/Banoffee-Pie-Recipe-Image-735x735.jpg");
 		List<CakeEntity> expectedValues = createInitialExpectedValues();
 		expectedValues.add(banoffeePie);
@@ -63,7 +63,7 @@ public class HibernateCakeDAOTest {
 		Assert.assertEquals(expectedValues, actualValues);
 		
 		// test that a cake violating the uniqueness constraint on title is not created
-		CakeEntity lemonCheeseCake = createCakeEntity("Lemon cheesecake", "A cheesecake made of lemon",
+		CakeEntity lemonCheeseCake = new CakeEntity(null, "Lemon cheesecake", "A cheesecake made of lemon",
 				"https://s3-eu-west-1.amazonaws.com/s3.mediafileserver.co.uk/carnation/WebFiles/RecipeImages/lemoncheesecake_lg.jpg");
 		cakeDAO.create(lemonCheeseCake);
 		actualValues = cakeDAO.readAll();
@@ -75,15 +75,15 @@ public class HibernateCakeDAOTest {
 	 */
 	private List<CakeEntity> createInitialExpectedValues() {
 		final List<CakeEntity> expectedValues = new ArrayList<>();
-		CakeEntity lemonCheeseCake = createCakeEntity("Lemon cheesecake", "A cheesecake made of lemon",
+		CakeEntity lemonCheeseCake =  new CakeEntity(null, "Lemon cheesecake", "A cheesecake made of lemon",
 				"https://s3-eu-west-1.amazonaws.com/s3.mediafileserver.co.uk/carnation/WebFiles/RecipeImages/lemoncheesecake_lg.jpg");
-		CakeEntity victoriaSponge = createCakeEntity("victoria sponge", "sponge with jam",
+		CakeEntity victoriaSponge = new CakeEntity(null, "victoria sponge", "sponge with jam",
 				"http://www.bbcgoodfood.com/sites/bbcgoodfood.com/files/recipe_images/recipe-image-legacy-id--1001468_10.jpg");
-		CakeEntity carrotCake = createCakeEntity("Carrot cake", "Bugs bunnys favourite",
+		CakeEntity carrotCake = new CakeEntity(null, "Carrot cake", "Bugs bunnys favourite",
 				"http://www.villageinn.com/i/pies/profile/carrotcake_main1.jpg");
-		CakeEntity bananaCake = createCakeEntity("Banana cake", "Donkey kongs favourite",
+		CakeEntity bananaCake = new CakeEntity(null, "Banana cake", "Donkey kongs favourite",
 				"http://ukcdn.ar-cdn.com/recipes/xlarge/ff22df7f-dbcd-4a09-81f7-9c1d8395d936.jpg");
-		CakeEntity birthdayCake = createCakeEntity("Birthday cake", "a yearly treat",
+		CakeEntity birthdayCake = new CakeEntity(null, "Birthday cake", "a yearly treat",
 				"http://cornandco.com/wp-content/uploads/2014/05/birthday-cake-popcorn.jpg");
 		
 		expectedValues.add(lemonCheeseCake);
@@ -92,17 +92,6 @@ public class HibernateCakeDAOTest {
 		expectedValues.add(bananaCake);
 		expectedValues.add(birthdayCake);
 		return expectedValues;
-	}
-
-	/**
-	 * Create a single CakeEntity value
-	 */
-	private CakeEntity createCakeEntity(final String title, final String description, final String image) {
-		CakeEntity expectedCakeValue = new CakeEntity();
-		expectedCakeValue.setTitle(title);
-		expectedCakeValue.setDescription(description);
-		expectedCakeValue.setImage(image);
-		return expectedCakeValue;
 	}
 
 }

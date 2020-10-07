@@ -6,15 +6,17 @@
 
 	<table style="width: 100%">
 		<tr>
+			<th align="left">Id</th>
 			<th align="left">Title</th>
 			<th align="left">Description</th>
 			<th align="left">Image</th>
 		</tr>
 		<c:forEach items="${cakeList}" var="cake">
 			<tr>
+				<td>${cake.id}</td>
 				<td>${cake.title}</td>
-				<td>${cake.description}</td>
-				<td><a href="${cake.image}">Image of ${cake.title}</a></td>
+				<td>${cake.desc}</td>
+				<td><a href="${cake.image}">${cake.title}</a></td>
 			</tr>
 		</c:forEach>
 	</table>
@@ -23,7 +25,7 @@
 
 	<form name="newCakeForm" method="post" action="">
 		Title: <input type="text" name="title" /> <br />
-		Description: <input type="text" name="description" /> <br />
+		Description: <input type="text" name="desc" /> <br />
 		Image: <input type="text" name="image" /> <br />
 		<input type="submit" value="Create Cake" />
 	</form>

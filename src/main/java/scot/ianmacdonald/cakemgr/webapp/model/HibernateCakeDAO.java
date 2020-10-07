@@ -10,9 +10,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import scot.ianmacdonald.cakemgr.webapp.controller.CakeEntityJsonTranslator;
 
 /**
  * A concrete implementation of the CakeDAO interface for use with a Hibernate in-memory DB.
@@ -37,8 +35,9 @@ public class HibernateCakeDAO implements CakeDAO {
 			try (InputStream inputStream = new URL(
 					"https://gist.githubusercontent.com/hart88/198f29ec5114a3ec3460/raw/8dd19a88f9b8d24c23d9960f3300d0c917a4f07c/cake.json")
 							.openStream()) {
+				
+				// read the json data into a StringBuffer
 				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
 				StringBuffer buffer = new StringBuffer();
 				String line = reader.readLine();
 				while (line != null) {
@@ -46,34 +45,11 @@ public class HibernateCakeDAO implements CakeDAO {
 					line = reader.readLine();
 				}
 
-				System.out.println("parsing cake json");
-				JsonParser parser = new JsonFactory().createParser(buffer.toString());
-				if (JsonToken.START_ARRAY != parser.nextToken()) {
-					throw new Exception("bad token");
-				}
-
-				JsonToken nextToken = parser.nextToken();
-				while (nextToken == JsonToken.START_OBJECT) {
-					System.out.println("creating cake entity");
-
-					CakeEntity cakeEntity = new CakeEntity();
-					System.out.println(parser.nextFieldName());
-					cakeEntity.setTitle(parser.nextTextValue());
-
-					System.out.println(parser.nextFieldName());
-					cakeEntity.setDescription(parser.nextTextValue());
-
-					System.out.println(parser.nextFieldName());
-					cakeEntity.setImage(parser.nextTextValue());
-
-					create(cakeEntity);
-
-					nextToken = parser.nextToken();
-					System.out.println(nextToken);
-
-					nextToken = parser.nextToken();
-					System.out.println(nextToken);
-				}
+				// translate the cake json into List<CakeEntity>
+				System.out.println("Translating cake json to Java");
+				
+				List<CakeEntity> cakeList = CakeEntityJsonTranslator.jsonToCakeEntityList(buffer.toString());
+				cakeList.forEach(x -> create(x));
 
 			} catch (Exception ex) {
 				throw new IOException(ex);

@@ -24,25 +24,43 @@ public class CakeEntity implements Serializable {
     private String title;
 
     @Column(name = "DESCRIPTION", unique = false, nullable = false, length = 100)
-    private String description;
+    private String desc;
 
     @Column(name = "IMAGE", unique = false, nullable = false, length = 300)
     private String image;
+    
+    public CakeEntity() {
+	}
+    
+    public CakeEntity (final Integer id, final String title, final String desc, final String image) {
+    	this.id = id;
+    	this.title = title;
+    	this.desc = desc;
+    	this.image = image;
+    }
+    
+    public Integer getId() {
+    	return id;
+    }
+    
+    public void setId(final Integer id) {
+    	this.id = id;
+    }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDesc() {
+        return desc;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDesc(final String desc) {
+        this.desc = desc;
     }
 
     public String getImage() {
@@ -60,7 +78,7 @@ public class CakeEntity implements Serializable {
     public boolean equals(Object other) {
     	if (other instanceof CakeEntity) {
     		return title.equals(((CakeEntity)other).title)
-    				&& description.equals(((CakeEntity)other).description)
+    				&& desc.equals(((CakeEntity)other).desc)
     				&& image.equals(((CakeEntity)other).image);
     	}
     	else return false;
