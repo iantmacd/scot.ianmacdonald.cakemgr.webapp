@@ -2,7 +2,7 @@
 
 <html>
 <body>
-	<h2>List of cakes that are stored in the DataBase:</h2>
+	<h2>List of Cakes that are Stored in the Database:</h2>
 
 	<table style="width: 100%">
 		<tr>
@@ -19,7 +19,7 @@
 		</c:forEach>
 	</table>
 
-	<h2>Add a cake to the Database:</h2>
+	<h2>Add a Cake to the Database:</h2>
 
 	<form name="newCakeForm" method="post" action="">
 		Title: <input type="text" name="title" /> <br />
