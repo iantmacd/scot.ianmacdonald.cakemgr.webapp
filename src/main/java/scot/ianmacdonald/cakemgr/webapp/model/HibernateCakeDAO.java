@@ -8,25 +8,56 @@ import java.net.URL;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.ConstraintViolationException;
+import org.hibernate.service.ServiceRegistry;
 
 import scot.ianmacdonald.cakemgr.webapp.controller.CakeEntityJsonTranslator;
 
 /**
- * A concrete implementation of the CakeDAO interface for use with a Hibernate in-memory DB.
+ * A concrete implementation of the CakeDAO interface for use with a Hibernate
+ * in-memory DB. Uses singleton access to to a org.hibernate.SessionFactory
+ * configured for use with a lightweight in-memory DB.
+ * 
  * @author ian.macdonald@ianmacdonald.scot
  *
  */
 public class HibernateCakeDAO implements CakeDAO {
-	
+
 	private static boolean dbIsInitialised = false;
+
+	private static SessionFactory sessionFactory = null;
 	
+	static {
+		// initialise the SessionFactory when the class is first loaded
+		buildSessionFactory();
+	}
+
+	private static void buildSessionFactory() {
+		try {
+			if (sessionFactory == null) {
+				Configuration configuration = new Configuration()
+						.configure(HibernateCakeDAO.class.getResource("/hibernate.cfg.xml"));
+				StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
+				serviceRegistryBuilder.applySettings(configuration.getProperties());
+				ServiceRegistry serviceRegistry = serviceRegistryBuilder.build();
+				sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+			}
+		} catch (Throwable ex) {
+			System.err.println("Initial SessionFactory creation failed." + ex);
+			throw new ExceptionInInitializerError(ex);
+		}
+	}
+
 	/**
 	 * Constructor which checks if the HInernate in-memory DB is initialised
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
 	public HibernateCakeDAO() throws IOException {
-		
+
 		if (!dbIsInitialised) {
 			// initialise the DB in a Hibernate way
 			System.out.println("init started");
@@ -35,7 +66,7 @@ public class HibernateCakeDAO implements CakeDAO {
 			try (InputStream inputStream = new URL(
 					"https://gist.githubusercontent.com/hart88/198f29ec5114a3ec3460/raw/8dd19a88f9b8d24c23d9960f3300d0c917a4f07c/cake.json")
 							.openStream()) {
-				
+
 				// read the json data into a StringBuffer
 				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 				StringBuffer buffer = new StringBuffer();
@@ -47,7 +78,7 @@ public class HibernateCakeDAO implements CakeDAO {
 
 				// translate the cake json into List<CakeEntity>
 				System.out.println("Translating cake json to Java");
-				
+
 				List<CakeEntity> cakeList = CakeEntityJsonTranslator.jsonToCakeEntityList(buffer.toString());
 				cakeList.forEach(x -> create(x));
 
@@ -59,11 +90,11 @@ public class HibernateCakeDAO implements CakeDAO {
 			dbIsInitialised = true;
 		}
 	}
-	
+
 	@Override
 	public List<CakeEntity> readAll() {
-		
-		Session session = HibernateUtil.getSessionFactory().openSession();
+
+		Session session = sessionFactory.openSession();
 		@SuppressWarnings("unchecked")
 		List<CakeEntity> list = session.createCriteria(CakeEntity.class).list();
 		session.close();
@@ -72,7 +103,8 @@ public class HibernateCakeDAO implements CakeDAO {
 
 	@Override
 	public CakeEntity create(CakeEntity cakeEntity) {
-		Session session = HibernateUtil.getSessionFactory().openSession();
+		
+		Session session = sessionFactory.openSession();
 		try {
 			session.beginTransaction();
 			session.persist(cakeEntity);
@@ -80,13 +112,12 @@ public class HibernateCakeDAO implements CakeDAO {
 			session.getTransaction().commit();
 		} catch (ConstraintViolationException ex) {
 			/*
-			 * Silently catching Exceptions is generally not good practice, but since
-			 * 1. The data source for this exercise is given as canonical
-			 * 2. It contains duplicates
-			 * 3. The uniqueness constraints on the DB table appear to be intentional
-			 * it is assumed duplicates can be ignored on initialisation of the DB, but
-			 * should not be when creating new entries purposefully.
-			 * TODO: introduce error handling for uniqueness constraint violation.
+			 * Silently catching Exceptions is generally not good practice, but since 1. The
+			 * data source for this exercise is given as canonical 2. It contains duplicates
+			 * 3. The uniqueness constraints on the DB table appear to be intentional it is
+			 * assumed duplicates can be ignored on initialisation of the DB, but should not
+			 * be when creating new entries purposefully. TODO: introduce error handling for
+			 * uniqueness constraint violation.
 			 */
 		}
 		session.close();
