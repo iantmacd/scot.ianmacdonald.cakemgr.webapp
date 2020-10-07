@@ -14,8 +14,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.service.ServiceRegistry;
 
-import scot.ianmacdonald.cakemgr.webapp.controller.PojoJsonTranslator;
-
 /**
  * A concrete implementation of the CakeDAO interface for use with a Hibernate
  * in-memory DB. Uses singleton access to to a org.hibernate.SessionFactory

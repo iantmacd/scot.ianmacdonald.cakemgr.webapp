@@ -1,4 +1,4 @@
-package scot.ianmacdonald.cakemgr.webapp.controller;
+package scot.ianmacdonald.cakemgr.webapp.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import junit.framework.Assert;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
+import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonTranslator;
 
 public class PojoJsonTranslatorTest {
 	

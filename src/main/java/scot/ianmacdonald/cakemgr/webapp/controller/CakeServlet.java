@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeDAO;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeDAOFactory;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
+import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonTranslator;
 
 @WebServlet(urlPatterns = { "/cakes", "/" })
 public class CakeServlet extends HttpServlet {

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package scot.ianmacdonald.cakemgr.webapp.controller;
+package scot.ianmacdonald.cakemgr.webapp.model;
 
 import java.io.IOException;
 import java.util.Arrays;
