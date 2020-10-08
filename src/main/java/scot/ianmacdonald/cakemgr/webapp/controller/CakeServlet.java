@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeDAO;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeDAOFactory;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
-import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonTranslator;
+import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonConverter;
 
 @WebServlet(urlPatterns = { "/cakes", "/" })
 public class CakeServlet extends HttpServlet {
@@ -39,7 +39,7 @@ public class CakeServlet extends HttpServlet {
 
 		if (request.getRequestURI().equals("/cakes")) {
 
-			response.getWriter().print(PojoJsonTranslator.pojoListToJson(list));
+			response.getWriter().print(PojoJsonConverter.pojoListToJson(list));
 
 		} else if (request.getRequestURI().equals("/")) {
 
@@ -76,13 +76,13 @@ public class CakeServlet extends HttpServlet {
 			}
 
 			// create a CakeEntity from the JSON
-			final CakeEntity cakeEntity = PojoJsonTranslator.jsonToPojo(cakeJsonBuffer.toString(), CakeEntity.class);
+			final CakeEntity cakeEntity = PojoJsonConverter.jsonToPojo(cakeJsonBuffer.toString(), CakeEntity.class);
 
 			// create the cake in the DB
 			final CakeEntity savedCakeEntity = cakeDAO.create(cakeEntity);
 
 			// output the DB content back to the client in the http response
-			response.getWriter().print(PojoJsonTranslator.pojoToJson(savedCakeEntity));
+			response.getWriter().print(PojoJsonConverter.pojoToJson(savedCakeEntity));
 
 		} else if (request.getRequestURI().equals("/")) {
 

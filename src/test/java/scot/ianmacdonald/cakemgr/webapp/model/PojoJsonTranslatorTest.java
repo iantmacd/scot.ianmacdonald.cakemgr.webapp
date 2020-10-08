@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import junit.framework.Assert;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
-import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonTranslator;
+import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonConverter;
 
 public class PojoJsonTranslatorTest {
 	
@@ -45,7 +45,7 @@ public class PojoJsonTranslatorTest {
 		final CakeEntity expectedValue = lemonCheeseCake;
 
 		// get actual result
-		final CakeEntity actualValue = PojoJsonTranslator.jsonToPojo(lemonCheeseCakeJson, CakeEntity.class);
+		final CakeEntity actualValue = PojoJsonConverter.jsonToPojo(lemonCheeseCakeJson, CakeEntity.class);
 
 		// compare the results
 		Assert.assertEquals("The two CakeEntity objects were not equal by value", expectedValue, actualValue);
@@ -59,7 +59,7 @@ public class PojoJsonTranslatorTest {
 		expectedValue.add(bananaCake);
 
 		// get actual result
-		final List<CakeEntity> actualValue = PojoJsonTranslator.jsonToPojoList(cakeListJson, CakeEntity[].class);
+		final List<CakeEntity> actualValue = PojoJsonConverter.jsonToPojoList(cakeListJson, CakeEntity[].class);
 
 		// compare the results
 		Assert.assertEquals("The two CakeEntity lists were not equal by value", expectedValue, actualValue);
@@ -72,7 +72,7 @@ public class PojoJsonTranslatorTest {
 		final String expectedValue = lemonCheeseCakeJson;
 		
 		// get actual result
-		final String actualValue = PojoJsonTranslator.pojoToJson(lemonCheeseCake);
+		final String actualValue = PojoJsonConverter.pojoToJson(lemonCheeseCake);
 		
 		// compare the results
 		Assert.assertEquals("The two JSON strings were not equal by value", expectedValue, actualValue);
@@ -89,7 +89,7 @@ public class PojoJsonTranslatorTest {
 		final List<CakeEntity> listToConvert = new ArrayList<>();
 		listToConvert.add(lemonCheeseCake);
 		listToConvert.add(bananaCake);
-		final String actualValue = PojoJsonTranslator.pojoListToJson(listToConvert);
+		final String actualValue = PojoJsonConverter.pojoListToJson(listToConvert);
 		
 		// compare the results
 		Assert.assertEquals("The two JSON strings were not equal by value", expectedValue, actualValue);

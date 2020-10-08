@@ -77,7 +77,7 @@ public class HibernateCakeDAO implements CakeDAO {
 				// translate the cake json into List<CakeEntity>
 				System.out.println("Translating cake json to Java");
 
-				List<CakeEntity> cakeList = PojoJsonTranslator.jsonToPojoList(buffer.toString(), CakeEntity[].class);
+				List<CakeEntity> cakeList = PojoJsonConverter.jsonToPojoList(buffer.toString(), CakeEntity[].class);
 				cakeList.forEach(x -> create(x));
 
 			} catch (Exception ex) {

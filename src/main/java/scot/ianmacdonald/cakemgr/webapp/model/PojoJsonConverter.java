@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
  * @author ian.macdonald@ianmacdonald.scot
  *
  */
-public class PojoJsonTranslator {
+public class PojoJsonConverter {
 	
 	private static ObjectMapper objectMapper = new ObjectMapper();
 	
