@@ -138,7 +138,7 @@ public class HibernateCakeDao implements CakeDao {
 			// we wish to propagate this runtime exception with the cause included
 			// so that clients can decide whether to handle it or not
 			throw new CakeDaoConstraintViolationException(
-					"org.hibernate.exception.ConstraintViolationException was thrown", ex);
+					"A cake with the title [" + cakeEntity.getTitle() + "] already exists in the DB", ex);
 
 		}
 		

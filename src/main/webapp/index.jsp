@@ -42,7 +42,13 @@
 				<td><input type="submit" value="Create Cake" /></td>
 			</tr>
 		</table>
-		<span class="error">${errorMessage.message}</span>
+		<br>
+		<span class="error">${errorMessage.message}</span><br>
+		<span class="error">${errorMessage.type}</span><br>
+		<span class="error">${errorMessage.causeType}</span><br>
+		<span class="error">${errorMessage.causeMessage}</span><br>
+		<span class="error">${errorMessage.causeStackTrace}</span><br>
+		
 	</form>
 
 </body>

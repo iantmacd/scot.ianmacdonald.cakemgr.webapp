@@ -17,6 +17,7 @@ import scot.ianmacdonald.cakemgr.webapp.model.CakeDaoConstraintViolationExceptio
 import scot.ianmacdonald.cakemgr.webapp.model.CakeDaoFactory;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
 import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonConverter;
+import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonConverterException;
 
 /**
  * Servlet class implementing controller functions for RESTful json-based
@@ -51,7 +52,19 @@ public class CakeServlet extends HttpServlet {
 		if (request.getRequestURI().equals("/cakes")) {
 
 			// RESTful service functions
-			response.getWriter().print(PojoJsonConverter.pojoListToJson(list));
+			try {
+
+				response.getWriter().print(PojoJsonConverter.pojoListToJson(list));
+
+			} catch (PojoJsonConverterException pjce) {
+
+				// could only happen if the objects retrieved from the DB could not be parsed
+				// which would be an internal server error condition so
+				// set the status code for the response to 500 (INTERNAL SERVER ERROR)
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				// no further processing is possible, so return the response
+				return;
+			}
 
 		}
 
@@ -93,14 +106,32 @@ public class CakeServlet extends HttpServlet {
 
 			} catch (Exception e) {
 
+				// fatal error while trying to read the request content
 				// set the status code for the response to 500 (INTERNAL SERVER ERROR)
 				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				// no further processing is possible, so return the response
+				// send the JSON error message via the http response
+				CakeExceptionMessage cakeExceptionMessage = generateCakeExceptionMessage(e);
+				response.getWriter().print(PojoJsonConverter.pojoToJson(cakeExceptionMessage));
 				return;
 			}
 
 			// create a CakeEntity from the JSON
-			final CakeEntity cakeEntity = PojoJsonConverter.jsonToPojo(cakeJsonBuffer.toString(), CakeEntity.class);
+			CakeEntity cakeEntity = null;
+			try {
+
+				cakeEntity = PojoJsonConverter.jsonToPojo(cakeJsonBuffer.toString(), CakeEntity.class);
+
+			} catch (PojoJsonConverterException pjce) {
+
+				// failure to convert JSON for a cake object into a CakeEntity object probably
+				// due to a malformed request from the client
+				// set the status code for the response to 400 (BAD REQUEST)
+				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+				// send the JSON error message via the http response
+				CakeExceptionMessage cakeExceptionMessage = generateCakeExceptionMessage(pjce);
+				response.getWriter().print(PojoJsonConverter.pojoToJson(cakeExceptionMessage));
+				return;
+			}
 
 			// create the cake in the DB
 			CakeEntity savedCakeEntity = null;
@@ -111,9 +142,9 @@ public class CakeServlet extends HttpServlet {
 			} catch (CakeDaoConstraintViolationException ex) {
 
 				// generate a message saying the cake already exists
-				final CakeExceptionMessage cakeServletMessage = generateDuplicateCakeMessage(cakeEntity, ex);
+				final CakeExceptionMessage cakeExceptionMessage = generateCakeExceptionMessage(ex);
 				// send the message via the http response
-				response.getWriter().print(PojoJsonConverter.pojoToJson(cakeServletMessage));
+				response.getWriter().print(PojoJsonConverter.pojoToJson(cakeExceptionMessage));
 				// set the status code for the response to 403 (FORBIDDEN)
 				response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 				// no further processing is possible, so return the response
@@ -142,12 +173,12 @@ public class CakeServlet extends HttpServlet {
 				cakeDao.create(cakeEntity);
 
 			} catch (CakeDaoConstraintViolationException ex) {
-				
+
 				// generate a message saying the cake already exists
-				final CakeExceptionMessage cakeServletMessage = generateDuplicateCakeMessage(cakeEntity, ex);
+				final CakeExceptionMessage cakeServletMessage = generateCakeExceptionMessage(ex);
 				// associate the message with the http request
 				request.setAttribute("errorMessage", cakeServletMessage);
-				
+
 			}
 
 			// update the list of cakes in the request for rendering by the JSP
@@ -160,9 +191,13 @@ public class CakeServlet extends HttpServlet {
 		}
 	}
 
-	private CakeExceptionMessage generateDuplicateCakeMessage(final CakeEntity cakeEntity, final Throwable throwable) {
-		final CakeExceptionMessage cakeServletMessage = new CakeExceptionMessage(
-				"A Cake with the title [" + cakeEntity.getTitle() + "] already exists in the DB.",
+	/*
+	 * Generate a CakeExceptionMessage object using a message and the caught
+	 * throwable
+	 */
+	private CakeExceptionMessage generateCakeExceptionMessage(final Throwable throwable) {
+
+		final CakeExceptionMessage cakeServletMessage = new CakeExceptionMessage(throwable.getMessage(),
 				throwable.getClass().getName(), throwable.getCause().getClass().getName(),
 				throwable.getCause().getMessage(), Arrays.toString(throwable.getCause().getStackTrace()));
 		return cakeServletMessage;
