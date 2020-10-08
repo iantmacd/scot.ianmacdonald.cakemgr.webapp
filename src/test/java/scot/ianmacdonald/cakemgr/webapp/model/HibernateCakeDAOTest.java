@@ -42,7 +42,7 @@ public class HibernateCakeDAOTest {
 		CakeDAO cakeDAO = null;
 		try {
 			cakeDAO = new HibernateCakeDAO();
-		} catch (IOException e) {
+		} catch (CakeDAOConstraintViolationException e) {
 			e.printStackTrace();
 			fail("An IOException was thrown when creating a reference to the CakeDAO");
 		}
@@ -65,7 +65,11 @@ public class HibernateCakeDAOTest {
 		// test that a cake violating the uniqueness constraint on title is not created
 		CakeEntity lemonCheeseCake = new CakeEntity(null, "Lemon cheesecake", "A cheesecake made of lemon",
 				"https://s3-eu-west-1.amazonaws.com/s3.mediafileserver.co.uk/carnation/WebFiles/RecipeImages/lemoncheesecake_lg.jpg");
+		try {
 		cakeDAO.create(lemonCheeseCake);
+		} catch (CakeDAOConstraintViolationException ex) {
+			// this is expected, we are choosing to do nothing here to check what's in the DB
+		}
 		actualValues = cakeDAO.readAll();
 		Assert.assertEquals(expectedValues, actualValues);
 	}

@@ -1,7 +1,6 @@
 package scot.ianmacdonald.cakemgr.webapp.model;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -81,19 +80,20 @@ public class HibernateCakeDAO implements CakeDAO {
 
 				List<CakeEntity> cakeList = PojoJsonConverter.jsonToPojoList(buffer.toString(), CakeEntity[].class);
 
-				try {
+				for (final CakeEntity cakeEntity: cakeList) {
+					try {
 
-					cakeList.forEach(x -> create(x));
+						create(cakeEntity);
 
-				} catch (CakeDAOConstraintViolationException cdex) {
-
-					// Silently catching Exceptions is generally not good practice, but since
-					// 1. The data source for this exercise is given as canonical
-					// 2. It contains duplicates
-					// 3. The uniqueness constraints on the DB table appear to be intentional
-					// 5. Hibernate logs these errors to standard output
-					// ... it is assumed duplicates can be ignored on initialisation of
-					// the DB, but should not be when creating new entries purposefully.
+					} catch (CakeDAOConstraintViolationException ex) {
+						// Silently catching Exceptions is generally not good practice, but since
+						// 1. The data source for this exercise is given as canonical
+						// 2. It contains duplicates
+						// 3. The uniqueness constraints on the DB table appear to be intentional
+						// 4. Hibernate logs these errors
+						// ... it is assumed duplicates can be ignored on initialisation of
+						// the DB, but should not be when creating new entries purposefully.
+					}
 				}
 
 			} catch (Exception ex) {
@@ -133,13 +133,15 @@ public class HibernateCakeDAO implements CakeDAO {
 
 		} catch (ConstraintViolationException ex) {
 
+			// close the session as otherwise will be left open
+			session.close();
 			// we wish to propagate this runtime exception with the cause included
 			// so that clients can decide whether to handle it or not
 			throw new CakeDAOConstraintViolationException(
 					"org.hibernate.exception.ConstraintViolationException was thrown", ex);
 
 		}
-
+		
 		session.close();
 		return cakeEntity;
 	}
