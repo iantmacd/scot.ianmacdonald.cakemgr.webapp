@@ -4,7 +4,7 @@
 <body>
 	<h2>List of Cakes that are Stored in the Database:</h2>
 
-	<table style="width: 100%">
+	<table style="width: 70%">
 		<tr>
 			<th align="left">Id</th>
 			<th align="left">Title</th>
@@ -24,10 +24,24 @@
 	<h2>Add a Cake to the Database:</h2>
 
 	<form name="newCakeForm" method="post" action="">
-		Title: <input type="text" name="title" /> <br />
-		Description: <input type="text" name="desc" /> <br />
-		Image: <input type="text" name="image" /> <br />
-		<input type="submit" value="Create Cake" />
+		<table style="width: 35%">
+			<tr>
+				<td align="right">Title:</td>
+				<td><input type="text" name="title" maxlength="100" /></td>
+			</tr>
+			<tr>
+				<td align="right">Description:</td>
+				<td><input type="text" name="desc" maxlength="100" /></td>
+			</tr>
+			<tr>
+				<td align="right">Image:</td>
+				<td><input type="text" name="image" maxlength="300" /></td>
+			</tr>
+			<tr>
+				<td></td>
+				<td><input type="submit" value="Create Cake" /></td>
+			</tr>
+		</table>
 	</form>
 
 </body>
