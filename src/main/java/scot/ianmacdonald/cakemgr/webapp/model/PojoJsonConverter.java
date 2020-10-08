@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -27,24 +24,24 @@ public class PojoJsonConverter {
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
 	}
 	
-	public static <T> T jsonToPojo(final String cakeJson, Class<T> clazz) throws JsonParseException, JsonMappingException, IOException {
+	public static <T> T jsonToPojo(final String cakeJson, Class<T> clazz) throws IOException {
 		
 		return objectMapper.readValue(cakeJson, clazz);
 	}
 	
-	public static <T> List<T> jsonToPojoList(final String pojoListJson, Class<T[]> clazz) throws JsonParseException, JsonMappingException, IOException {
+	public static <T> List<T> jsonToPojoList(final String pojoListJson, Class<T[]> clazz) throws IOException {
 		
 		T[] arrayResult = objectMapper.readValue(pojoListJson, clazz);
 		List<T> list = Arrays.asList(arrayResult);
 		return list;
 	}
 	
-	public static String pojoToJson(final Object pojo) throws JsonProcessingException {
+	public static String pojoToJson(final Object pojo) throws IOException {
 		
 		return objectMapper.writeValueAsString(pojo);
 	}
 	
-	public static <T> String pojoListToJson(final List<T> pojoList) throws JsonProcessingException  {
+	public static <T> String pojoListToJson(final List<T> pojoList) throws IOException  {
 		
 		return objectMapper.writeValueAsString(pojoList.toArray());
 	}
