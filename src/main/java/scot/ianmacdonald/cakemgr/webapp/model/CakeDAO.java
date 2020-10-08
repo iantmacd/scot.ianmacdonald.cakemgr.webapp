@@ -18,6 +18,6 @@ public interface CakeDAO {
 	/*
 	 * Create a new CakeEntity entry in the DB
 	 */
-	public CakeEntity create(CakeEntity cakeEntity);
+	public CakeEntity create(CakeEntity cakeEntity) throws CakeDAOConstraintViolationException;
 
 }

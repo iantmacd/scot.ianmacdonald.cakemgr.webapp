@@ -27,36 +27,38 @@ public class HibernateCakeDAO implements CakeDAO {
 	private static boolean dbIsInitialised = false;
 
 	private static SessionFactory sessionFactory = null;
-	
-	static {
-		// initialise the SessionFactory when the class is first loaded
-		buildSessionFactory();
-	}
 
-	private static void buildSessionFactory() {
+	static {
+
+		// initialise the SessionFactory when the class is first loaded
 		try {
-			if (sessionFactory == null) {
-				Configuration configuration = new Configuration()
-						.configure(HibernateCakeDAO.class.getResource("/hibernate.cfg.xml"));
-				StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
-				serviceRegistryBuilder.applySettings(configuration.getProperties());
-				ServiceRegistry serviceRegistry = serviceRegistryBuilder.build();
-				sessionFactory = configuration.buildSessionFactory(serviceRegistry);
-			}
+
+			Configuration configuration = new Configuration()
+					.configure(HibernateCakeDAO.class.getResource("/hibernate.cfg.xml"));
+			StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
+			serviceRegistryBuilder.applySettings(configuration.getProperties());
+			ServiceRegistry serviceRegistry = serviceRegistryBuilder.build();
+			sessionFactory = configuration.buildSessionFactory(serviceRegistry);
+
 		} catch (Throwable ex) {
+
 			System.err.println("Initial SessionFactory creation failed." + ex);
+			// unrecoverable... fail catastrophically
 			throw new ExceptionInInitializerError(ex);
+
 		}
 	}
 
 	/**
-	 * Constructor which checks if the HInernate in-memory DB is initialised
-	 * 
-	 * @throws IOException
+	 * Constructor which checks if the Hibernate in-memory DB is initialised.
+	 * Normally initialising data would be an application concern, but since this is
+	 * effectively a test DAO implementation, it is included here for convenience
+	 * and ease of testing, and treated as a system requirement for error handling.
 	 */
-	public HibernateCakeDAO() throws IOException {
+	public HibernateCakeDAO() {
 
 		if (!dbIsInitialised) {
+
 			// initialise the DB in a Hibernate way
 			System.out.println("init started");
 
@@ -78,10 +80,28 @@ public class HibernateCakeDAO implements CakeDAO {
 				System.out.println("Translating cake json to Java");
 
 				List<CakeEntity> cakeList = PojoJsonConverter.jsonToPojoList(buffer.toString(), CakeEntity[].class);
-				cakeList.forEach(x -> create(x));
+
+				try {
+
+					cakeList.forEach(x -> create(x));
+
+				} catch (CakeDAOConstraintViolationException cdex) {
+
+					// Silently catching Exceptions is generally not good practice, but since
+					// 1. The data source for this exercise is given as canonical
+					// 2. It contains duplicates
+					// 3. The uniqueness constraints on the DB table appear to be intentional
+					// 5. Hibernate logs these errors to standard output
+					// ... it is assumed duplicates can be ignored on initialisation of
+					// the DB, but should not be when creating new entries purposefully.
+				}
 
 			} catch (Exception ex) {
-				throw new IOException(ex);
+				// A throwable other than a CakeDAOConstraintViolationException occurred
+				System.err.println("Initial data load into HibernateCakeDAO failed." + ex);
+				// for this app's requirements, this is unrecoverable... fail catastrophically
+				throw new ExceptionInInitializerError(ex);
+
 			}
 
 			System.out.println("init finished");
@@ -97,27 +117,29 @@ public class HibernateCakeDAO implements CakeDAO {
 		List<CakeEntity> list = session.createCriteria(CakeEntity.class).list();
 		session.close();
 		return list;
+
 	}
 
 	@Override
-	public CakeEntity create(CakeEntity cakeEntity) {
-		
+	public CakeEntity create(CakeEntity cakeEntity) throws CakeDAOConstraintViolationException {
+
 		Session session = sessionFactory.openSession();
 		try {
+
 			session.beginTransaction();
 			session.persist(cakeEntity);
 			System.out.println("adding cake entity");
 			session.getTransaction().commit();
+
 		} catch (ConstraintViolationException ex) {
-			/*
-			 * Silently catching Exceptions is generally not good practice, but since 1. The
-			 * data source for this exercise is given as canonical 2. It contains duplicates
-			 * 3. The uniqueness constraints on the DB table appear to be intentional it is
-			 * assumed duplicates can be ignored on initialisation of the DB, but should not
-			 * be when creating new entries purposefully. TODO: introduce error handling for
-			 * uniqueness constraint violation.
-			 */
+
+			// we wish to propagate this runtime exception with the cause included
+			// so that clients can decide whether to handle it or not
+			throw new CakeDAOConstraintViolationException(
+					"org.hibernate.exception.ConstraintViolationException was thrown", ex);
+
 		}
+
 		session.close();
 		return cakeEntity;
 	}
