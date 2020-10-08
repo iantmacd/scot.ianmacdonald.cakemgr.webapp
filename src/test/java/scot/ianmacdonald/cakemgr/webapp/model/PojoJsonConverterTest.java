@@ -11,8 +11,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import junit.framework.Assert;
-import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
-import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonConverter;
 
 public class PojoJsonConverterTest {
 	
