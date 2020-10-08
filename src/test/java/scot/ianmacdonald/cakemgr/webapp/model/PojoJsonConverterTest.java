@@ -14,7 +14,7 @@ import junit.framework.Assert;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
 import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonConverter;
 
-public class PojoJsonTranslatorTest {
+public class PojoJsonConverterTest {
 	
 	// common test data
 	private final String lemonCheeseCakeJson = "{\n"
