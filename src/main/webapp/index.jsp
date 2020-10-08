@@ -42,6 +42,7 @@
 				<td><input type="submit" value="Create Cake" /></td>
 			</tr>
 		</table>
+		<span class="error">${errorMessage.message}</span>
 	</form>
 
 </body>
