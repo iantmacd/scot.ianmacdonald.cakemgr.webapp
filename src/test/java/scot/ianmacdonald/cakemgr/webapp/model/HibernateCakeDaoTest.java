@@ -11,25 +11,25 @@ import org.junit.Test;
 import junit.framework.Assert;
 
 /**
- * JUnit test class for {@link HibernateCakeDAO}
+ * JUnit test class for {@link HibernateCakeDao}
  * Also effectively tests the {@link HibernateUtil} class in this configuration
  * 
  * @author ian.macdonald@ianmacdonald.scot
  *
  */
-public class HibernateCakeDAOTest {
+public class HibernateCakeDaoTest {
 
 	@Test
 	public void testReadAll() throws IOException {
 
-		// get a reference to a HibernateCakeDAO
-		final CakeDAO cakeDAO = new HibernateCakeDAO();
+		// get a reference to a HibernateCakeDao
+		final CakeDao cakeDao = new HibernateCakeDao();
 
 		// test the readAll() method returns the values expected based on the JSON data feed
 		final List<CakeEntity> expectedValues = createInitialExpectedValues();
 
 		// call the method under test
-		final List<CakeEntity> actualValues = cakeDAO.readAll();
+		final List<CakeEntity> actualValues = cakeDao.readAll();
 		
 		// compare the expected and actual values using List.equals(Object o)
 		Assert.assertEquals(expectedValues, actualValues);
@@ -38,13 +38,13 @@ public class HibernateCakeDAOTest {
 	@Test
 	public void testCreate() {
 		
-		// get a reference to the HibernateCakeDAO
-		CakeDAO cakeDAO = null;
+		// get a reference to the HibernateCakeDao
+		CakeDao cakeDao = null;
 		try {
-			cakeDAO = new HibernateCakeDAO();
-		} catch (CakeDAOConstraintViolationException e) {
+			cakeDao = new HibernateCakeDao();
+		} catch (CakeDaoConstraintViolationException e) {
 			e.printStackTrace();
-			fail("An IOException was thrown when creating a reference to the CakeDAO");
+			fail("An IOException was thrown when creating a reference to the CakeDao");
 		}
 		
 		// create the CakeEntity we are going to add to the DB
@@ -54,10 +54,10 @@ public class HibernateCakeDAOTest {
 		expectedValues.add(banoffeePie);
 		
 		// add banoffee pie to the DB
-		cakeDAO.create(banoffeePie);
+		cakeDao.create(banoffeePie);
 		
 		// get the new list of actual values by reading all cakes from the DB
-		List<CakeEntity> actualValues = cakeDAO.readAll();
+		List<CakeEntity> actualValues = cakeDao.readAll();
 		
 		// compare the expected and actual values using List.equals(Object o)
 		Assert.assertEquals(expectedValues, actualValues);
@@ -66,11 +66,11 @@ public class HibernateCakeDAOTest {
 		CakeEntity lemonCheeseCake = new CakeEntity(null, "Lemon cheesecake", "A cheesecake made of lemon",
 				"https://s3-eu-west-1.amazonaws.com/s3.mediafileserver.co.uk/carnation/WebFiles/RecipeImages/lemoncheesecake_lg.jpg");
 		try {
-		cakeDAO.create(lemonCheeseCake);
-		} catch (CakeDAOConstraintViolationException ex) {
+		cakeDao.create(lemonCheeseCake);
+		} catch (CakeDaoConstraintViolationException ex) {
 			// this is expected, we are choosing to do nothing here to check what's in the DB
 		}
-		actualValues = cakeDAO.readAll();
+		actualValues = cakeDao.readAll();
 		Assert.assertEquals(expectedValues, actualValues);
 	}
 

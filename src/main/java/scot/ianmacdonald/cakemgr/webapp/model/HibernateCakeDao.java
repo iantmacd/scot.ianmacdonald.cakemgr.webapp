@@ -14,14 +14,14 @@ import org.hibernate.exception.ConstraintViolationException;
 import org.hibernate.service.ServiceRegistry;
 
 /**
- * A concrete implementation of the CakeDAO interface for use with a Hibernate
+ * A concrete implementation of the CakeDao interface for use with a Hibernate
  * in-memory DB. Uses singleton access to to a org.hibernate.SessionFactory
  * configured for use with a lightweight in-memory DB.
  * 
  * @author ian.macdonald@ianmacdonald.scot
  *
  */
-public class HibernateCakeDAO implements CakeDAO {
+public class HibernateCakeDao implements CakeDao {
 
 	private static boolean dbIsInitialised = false;
 
@@ -33,7 +33,7 @@ public class HibernateCakeDAO implements CakeDAO {
 		try {
 
 			Configuration configuration = new Configuration()
-					.configure(HibernateCakeDAO.class.getResource("/hibernate.cfg.xml"));
+					.configure(HibernateCakeDao.class.getResource("/hibernate.cfg.xml"));
 			StandardServiceRegistryBuilder serviceRegistryBuilder = new StandardServiceRegistryBuilder();
 			serviceRegistryBuilder.applySettings(configuration.getProperties());
 			ServiceRegistry serviceRegistry = serviceRegistryBuilder.build();
@@ -51,10 +51,10 @@ public class HibernateCakeDAO implements CakeDAO {
 	/**
 	 * Constructor which checks if the Hibernate in-memory DB is initialised.
 	 * Normally initialising data would be an application concern, but since this is
-	 * effectively a test DAO implementation, it is included here for convenience
+	 * effectively a test Dao implementation, it is included here for convenience
 	 * and ease of testing, and treated as a system requirement for error handling.
 	 */
-	public HibernateCakeDAO() {
+	public HibernateCakeDao() {
 
 		if (!dbIsInitialised) {
 
@@ -85,7 +85,7 @@ public class HibernateCakeDAO implements CakeDAO {
 
 						create(cakeEntity);
 
-					} catch (CakeDAOConstraintViolationException ex) {
+					} catch (CakeDaoConstraintViolationException ex) {
 						// Silently catching Exceptions is generally not good practice, but since
 						// 1. The data source for this exercise is given as canonical
 						// 2. It contains duplicates
@@ -97,8 +97,8 @@ public class HibernateCakeDAO implements CakeDAO {
 				}
 
 			} catch (Exception ex) {
-				// A throwable other than a CakeDAOConstraintViolationException occurred
-				System.err.println("Initial data load into HibernateCakeDAO failed." + ex);
+				// A throwable other than a CakeDaoConstraintViolationException occurred
+				System.err.println("Initial data load into HibernateCakeDao failed." + ex);
 				// for this app's requirements, this is unrecoverable... fail catastrophically
 				throw new ExceptionInInitializerError(ex);
 
@@ -121,7 +121,7 @@ public class HibernateCakeDAO implements CakeDAO {
 	}
 
 	@Override
-	public CakeEntity create(CakeEntity cakeEntity) throws CakeDAOConstraintViolationException {
+	public CakeEntity create(CakeEntity cakeEntity) throws CakeDaoConstraintViolationException {
 
 		Session session = sessionFactory.openSession();
 		try {
@@ -137,7 +137,7 @@ public class HibernateCakeDAO implements CakeDAO {
 			session.close();
 			// we wish to propagate this runtime exception with the cause included
 			// so that clients can decide whether to handle it or not
-			throw new CakeDAOConstraintViolationException(
+			throw new CakeDaoConstraintViolationException(
 					"org.hibernate.exception.ConstraintViolationException was thrown", ex);
 
 		}

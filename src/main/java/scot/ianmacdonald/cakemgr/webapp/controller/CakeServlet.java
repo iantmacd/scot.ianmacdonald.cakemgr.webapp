@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import scot.ianmacdonald.cakemgr.webapp.model.CakeDAO;
-import scot.ianmacdonald.cakemgr.webapp.model.CakeDAOConstraintViolationException;
-import scot.ianmacdonald.cakemgr.webapp.model.CakeDAOFactory;
+import scot.ianmacdonald.cakemgr.webapp.model.CakeDao;
+import scot.ianmacdonald.cakemgr.webapp.model.CakeDaoConstraintViolationException;
+import scot.ianmacdonald.cakemgr.webapp.model.CakeDaoFactory;
 import scot.ianmacdonald.cakemgr.webapp.model.CakeEntity;
 import scot.ianmacdonald.cakemgr.webapp.model.PojoJsonConverter;
 
@@ -41,11 +41,11 @@ public class CakeServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		// Functions common to RESTful service and webapp
-		// Get a reference to a CakeDAO for accessing the DB
-		CakeDAO cakeDAO = CakeDAOFactory.getCakeDAO();
+		// Get a reference to a CakeDap for accessing the DB
+		CakeDao cakeDao = CakeDaoFactory.getCakeDao();
 
 		// read all the cakes in the DB
-		List<CakeEntity> list = cakeDAO.readAll();
+		List<CakeEntity> list = cakeDao.readAll();
 
 		if (request.getRequestURI().equals("/cakes")) {
 
@@ -75,8 +75,8 @@ public class CakeServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		// Functions common to RESTful service and webapp
-		// Get a reference to a CakeDAO for accessing the DB
-		CakeDAO cakeDAO = CakeDAOFactory.getCakeDAO();
+		// Get a reference to a CakeDao for accessing the DB
+		CakeDao cakeDao = CakeDaoFactory.getCakeDao();
 
 		if (request.getRequestURI().equals("/cakes")) {
 
@@ -105,9 +105,9 @@ public class CakeServlet extends HttpServlet {
 			CakeEntity savedCakeEntity = null;
 			try {
 
-				savedCakeEntity = cakeDAO.create(cakeEntity);
+				savedCakeEntity = cakeDao.create(cakeEntity);
 
-			} catch (CakeDAOConstraintViolationException ex) {
+			} catch (CakeDaoConstraintViolationException ex) {
 
 				// generate a message saying the cake already exists
 				final CakeServletMessage cakeServletMessage = new CakeServletMessage(
@@ -139,9 +139,9 @@ public class CakeServlet extends HttpServlet {
 			// create the cake in the DB
 			try {
 
-				cakeDAO.create(cakeEntity);
+				cakeDao.create(cakeEntity);
 
-			} catch (CakeDAOConstraintViolationException ex) {
+			} catch (CakeDaoConstraintViolationException ex) {
 				
 				// generate a message saying the cake already exists
 				final CakeServletMessage cakeServletMessage = new CakeServletMessage(
@@ -152,7 +152,7 @@ public class CakeServlet extends HttpServlet {
 			}
 
 			// update the list of cakes in the request for rendering by the JSP
-			final List<CakeEntity> list = cakeDAO.readAll();
+			final List<CakeEntity> list = cakeDao.readAll();
 			request.setAttribute("cakeList", list);
 
 			// forward the request/response to the display

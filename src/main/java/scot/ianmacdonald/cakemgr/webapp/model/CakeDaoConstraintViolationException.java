@@ -1,6 +1,6 @@
 package scot.ianmacdonald.cakemgr.webapp.model;
 
-public class CakeDAOConstraintViolationException extends RuntimeException {
+public class CakeDaoConstraintViolationException extends RuntimeException {
 
 	/**
 	 * Generated serialVersionUID
@@ -9,9 +9,9 @@ public class CakeDAOConstraintViolationException extends RuntimeException {
 
 	/**
 	 * Runtime exception wrapping exceptions thrown by implementations of the
-	 * CakeDAO class.
+	 * CakeDao class.
 	 */
-	public CakeDAOConstraintViolationException(String errorMessage, Throwable throwable) {
+	public CakeDaoConstraintViolationException(String errorMessage, Throwable throwable) {
 		super(errorMessage, throwable);
 	}
 }

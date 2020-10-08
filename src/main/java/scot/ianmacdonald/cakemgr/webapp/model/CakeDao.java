@@ -8,7 +8,7 @@ import java.util.List;
  * @author ian.macdonald@ianmacdonald.scot
  *
  */
-public interface CakeDAO {
+public interface CakeDao {
 	
 	/*
 	 * Read all the CakeEntity objects stored in the DB
@@ -18,6 +18,6 @@ public interface CakeDAO {
 	/*
 	 * Create a new CakeEntity entry in the DB
 	 */
-	public CakeEntity create(CakeEntity cakeEntity) throws CakeDAOConstraintViolationException;
+	public CakeEntity create(CakeEntity cakeEntity) throws CakeDaoConstraintViolationException;
 
 }
