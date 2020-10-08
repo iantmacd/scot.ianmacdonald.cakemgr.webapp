@@ -2,6 +2,7 @@ package scot.ianmacdonald.cakemgr.webapp.controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -110,8 +111,7 @@ public class CakeServlet extends HttpServlet {
 			} catch (CakeDaoConstraintViolationException ex) {
 
 				// generate a message saying the cake already exists
-				final CakeServletMessage cakeServletMessage = new CakeServletMessage(
-						"A Cake with the title [" + cakeEntity.getTitle() + "] already exists in the DB.");
+				final CakeExceptionMessage cakeServletMessage = generateDuplicateCakeMessage(cakeEntity, ex);
 				// send the message via the http response
 				response.getWriter().print(PojoJsonConverter.pojoToJson(cakeServletMessage));
 				// set the status code for the response to 403 (FORBIDDEN)
@@ -144,8 +144,7 @@ public class CakeServlet extends HttpServlet {
 			} catch (CakeDaoConstraintViolationException ex) {
 				
 				// generate a message saying the cake already exists
-				final CakeServletMessage cakeServletMessage = new CakeServletMessage(
-						"A Cake with the title [" + cakeEntity.getTitle() + "] already exists in the DB.");
+				final CakeExceptionMessage cakeServletMessage = generateDuplicateCakeMessage(cakeEntity, ex);
 				// associate the message with the http request
 				request.setAttribute("errorMessage", cakeServletMessage);
 				
@@ -159,6 +158,14 @@ public class CakeServlet extends HttpServlet {
 			RequestDispatcher requestDispatcher = request.getRequestDispatcher("index.jsp");
 			requestDispatcher.forward(request, response);
 		}
+	}
+
+	private CakeExceptionMessage generateDuplicateCakeMessage(final CakeEntity cakeEntity, final Throwable throwable) {
+		final CakeExceptionMessage cakeServletMessage = new CakeExceptionMessage(
+				"A Cake with the title [" + cakeEntity.getTitle() + "] already exists in the DB.",
+				throwable.getClass().getName(), throwable.getCause().getClass().getName(),
+				throwable.getCause().getMessage(), Arrays.toString(throwable.getCause().getStackTrace()));
+		return cakeServletMessage;
 	}
 
 }
