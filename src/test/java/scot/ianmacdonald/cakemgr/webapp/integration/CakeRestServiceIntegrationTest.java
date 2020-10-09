@@ -31,7 +31,7 @@ import org.junit.runners.MethodSorters;
  * @author ian.macdonald@ianmacdonald.scot
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class CakeRestServiceTest {
+public class CakeRestServiceIntegrationTest {
 
 	// test data
 	private final CloseableHttpClient httpclient = HttpClients.createDefault();
