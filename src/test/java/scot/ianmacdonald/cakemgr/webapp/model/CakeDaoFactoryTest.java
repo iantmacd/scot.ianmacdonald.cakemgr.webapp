@@ -2,11 +2,8 @@ package scot.ianmacdonald.cakemgr.webapp.model;
 
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
-
+import org.junit.Assert;
 import org.junit.Test;
-
-import junit.framework.Assert;
 
 public class CakeDaoFactoryTest {
 
@@ -17,8 +14,8 @@ public class CakeDaoFactoryTest {
 		CakeDao cakeDao = null;
 		try {
 			cakeDao = CakeDaoFactory.getCakeDao();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (Throwable throwable) {
+			throwable.printStackTrace();
 			fail("An IOException was thrown when creating a reference to the CakeDao");
 		}
 		

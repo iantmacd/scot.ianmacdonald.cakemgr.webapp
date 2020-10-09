@@ -42,7 +42,7 @@ public class HibernateCakeDao implements CakeDao {
 		} catch (Throwable ex) {
 
 			System.err.println("Initial SessionFactory creation failed." + ex);
-			// unrecoverable... fail catastrophically
+			// unrecoverable... fail fatally
 			throw new ExceptionInInitializerError(ex);
 
 		}
@@ -80,7 +80,7 @@ public class HibernateCakeDao implements CakeDao {
 
 				List<CakeEntity> cakeList = PojoJsonConverter.jsonToPojoList(buffer.toString(), CakeEntity[].class);
 
-				for (final CakeEntity cakeEntity: cakeList) {
+				for (final CakeEntity cakeEntity : cakeList) {
 					try {
 
 						create(cakeEntity);
@@ -99,7 +99,7 @@ public class HibernateCakeDao implements CakeDao {
 			} catch (Exception ex) {
 				// A throwable other than a CakeDaoConstraintViolationException occurred
 				System.err.println("Initial data load into HibernateCakeDao failed." + ex);
-				// for this app's requirements, this is unrecoverable... fail catastrophically
+				// for this app's requirements, this is unrecoverable... fail fatally
 				throw new ExceptionInInitializerError(ex);
 
 			}
@@ -109,13 +109,35 @@ public class HibernateCakeDao implements CakeDao {
 		}
 	}
 
+	/*
+	 * @SuppressWarnings("unchecked") needed for call to List
+	 * org.hibernate.Criteria.list()
+	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<CakeEntity> readAll() {
 
 		Session session = sessionFactory.openSession();
-		@SuppressWarnings("unchecked")
-		List<CakeEntity> list = session.createCriteria(CakeEntity.class).list();
-		session.close();
+		List<CakeEntity> list = null;
+
+		try {
+
+			// I checked if there were typed versions of this method in later versions of
+			// hibernate, but the method with the untyped List is the only option. We can
+			// however see that we make the Criteria use a CakeEntity.class here.
+			list = session.createCriteria(CakeEntity.class).list();
+
+		} catch (Exception e) {
+
+			// TODO: what exception handling needed for a general failed read on the DB?
+
+		} finally {
+
+			// ensure all hibernate sessions are closed
+			session.close();
+
+		}
+
 		return list;
 
 	}
@@ -124,6 +146,7 @@ public class HibernateCakeDao implements CakeDao {
 	public CakeEntity create(CakeEntity cakeEntity) throws CakeDaoConstraintViolationException {
 
 		Session session = sessionFactory.openSession();
+
 		try {
 
 			session.beginTransaction();
@@ -133,16 +156,22 @@ public class HibernateCakeDao implements CakeDao {
 
 		} catch (ConstraintViolationException ex) {
 
-			// close the session as otherwise will be left open
-			session.close();
 			// we wish to propagate this runtime exception with the cause included
 			// so that clients can decide whether to handle it or not
 			throw new CakeDaoConstraintViolationException(
 					"A cake with the title [" + cakeEntity.getTitle() + "] already exists in the DB", ex);
 
+		} catch (Exception e) {
+
+			// TODO: what exception handling needed for a general failed create on the DB?
+
+		} finally {
+
+			// ensure all hibernate sessions are closed
+			session.close();
+
 		}
-		
-		session.close();
+
 		return cakeEntity;
 	}
 
