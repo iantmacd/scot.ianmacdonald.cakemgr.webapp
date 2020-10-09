@@ -3,8 +3,6 @@
  */
 package scot.ianmacdonald.cakemgr.webapp.model;
 
-import java.io.IOException;
-
 /**
  * A Factory object for getting a reference to a CakeDao implementation.
  * @author ian.macdonald@ianmacdonald.scot
@@ -12,7 +10,7 @@ import java.io.IOException;
  */
 public class CakeDaoFactory {
 	
-	public static CakeDao getCakeDao() throws IOException {
+	public static CakeDao getCakeDao() {
 		/*
 		 * For now, this returns the one concrete type available, but creates an
 		 * extension point where configuration or dependency injection could be used

@@ -15,16 +15,13 @@ public class CakeExceptionMessage {
 
 	private String causeMessage;
 
-	private String causeStackTrace;
-	
 	public CakeExceptionMessage(final String message, final String type, final String causeType,
-			final String causeMessage, final String causeStackTrace) {
+			final String causeMessage) {
 
 		this.message = message;
 		this.type = type;
 		this.causeType = causeType;
 		this.causeMessage = causeMessage;
-		this.causeStackTrace = causeStackTrace;
 	}
 
 	public String getMessage() {
@@ -57,14 +54,6 @@ public class CakeExceptionMessage {
 
 	public void setCauseMessage(String causeMessage) {
 		this.causeMessage = causeMessage;
-	}
-
-	public String getCauseStackTrace() {
-		return causeStackTrace;
-	}
-
-	public void setCauseStackTrace(String causeStackTrace) {
-		this.causeStackTrace = causeStackTrace;
 	}
 
 }

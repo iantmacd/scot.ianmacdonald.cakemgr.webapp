@@ -2,8 +2,8 @@ package scot.ianmacdonald.cakemgr.webapp.controller;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -43,7 +43,7 @@ public class CakeServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		// Functions common to RESTful service and webapp
-		// Get a reference to a CakeDap for accessing the DB
+		// Get a reference to a CakeDao for accessing the DB
 		CakeDao cakeDao = CakeDaoFactory.getCakeDao();
 
 		// read all the cakes in the DB
@@ -59,10 +59,10 @@ public class CakeServlet extends HttpServlet {
 			} catch (PojoJsonConverterException pjce) {
 
 				// could only happen if the objects retrieved from the DB could not be parsed
-				// which would be an internal server error condition so
+				// to JSON, which would be an internal server error condition so
 				// set the status code for the response to 500 (INTERNAL SERVER ERROR)
 				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				// no further processing is possible, so return the response
+				// no further processing is possible here, so return the response
 				return;
 			}
 
@@ -83,6 +83,8 @@ public class CakeServlet extends HttpServlet {
 	/**
 	 * Handle the create operations of the RESTful service and webapp using the http
 	 * POST method, as per REST principles
+	 * 
+	 * @throws IOException
 	 */
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -96,13 +98,10 @@ public class CakeServlet extends HttpServlet {
 
 			// RESTful service functions
 			// read the JSON for the new cake object from the request body
-			final StringBuffer cakeJsonBuffer = new StringBuffer();
-			String line = null;
+			String putCakeJsonRequest = null;
 			try {
 
-				BufferedReader reader = request.getReader();
-				while ((line = reader.readLine()) != null)
-					cakeJsonBuffer.append(line);
+				putCakeJsonRequest = new BufferedReader(request.getReader()).lines().collect(Collectors.joining("\n"));
 
 			} catch (Exception e) {
 
@@ -119,13 +118,13 @@ public class CakeServlet extends HttpServlet {
 			CakeEntity cakeEntity = null;
 			try {
 
-				cakeEntity = PojoJsonConverter.jsonToPojo(cakeJsonBuffer.toString(), CakeEntity.class);
+				cakeEntity = PojoJsonConverter.jsonToPojo(putCakeJsonRequest, CakeEntity.class);
 
 			} catch (PojoJsonConverterException pjce) {
 
 				// failure to convert JSON for a cake object into a CakeEntity object probably
 				// due to a malformed request from the client
-				// set the status code for the response to 400 (BAD REQUEST)
+				// Set the status code for the response to 400 (BAD REQUEST)
 				response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				// send the JSON error message via the http response
 				CakeExceptionMessage cakeExceptionMessage = generateCakeExceptionMessage(pjce);
@@ -199,7 +198,7 @@ public class CakeServlet extends HttpServlet {
 
 		final CakeExceptionMessage cakeServletMessage = new CakeExceptionMessage(throwable.getMessage(),
 				throwable.getClass().getName(), throwable.getCause().getClass().getName(),
-				throwable.getCause().getMessage(), Arrays.toString(throwable.getCause().getStackTrace()));
+				throwable.getCause().getMessage());
 		return cakeServletMessage;
 	}
 
