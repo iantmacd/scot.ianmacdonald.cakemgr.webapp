@@ -1,0 +1,215 @@
+Ian MacDonald Cake Manager Web Service and Web Application Phase 1 Submission
+=============================================================================
+
+Requirements Analysis
+=====================
+
+The requirement that both the human-readable web application and JSON-based RESTful web service can
+display all cakes and create new cakes implies two underlying functions of the application:
+1. Ability to read all cakes from the DB and render in an appropriate format
+2. Ability to add a new cake to the DB
+
+It is also interpreted as given that:
+1. The underlying hibernate in-memory DB should remain in use
+2. The JSON data at the provided web URL is canonical for the initial load of data to the system
+(https://gist.githubusercontent.com/hart88/198f29ec5114a3ec3460/raw
+											/8dd19a88f9b8d24c23d9960f3300d0c917a4f07c/cake.json)
+
+As a consequence, the system will be built from the bottom up based on the Data Access Object (DAO)
+pattern, exposing two methods:
+
+public List<CakeEntity> readAll()
+public CakeEntity create(CakeEntity cake)
+
+Which can then be exercised by the controller layer, to be exposed at appropriate web URLs and
+contexts in human-readable (HTML) and JSON formats.
+
+In addition the requirement to move towards a RESTful architecture requires that:
+1. All read operations should use the HTTP GET method
+2. All create operations should use the HTTP POST method
+3. HTTP responses use appropriate HTTP response codes to indicate success and failure conditions
+4. HTTP responses from the JSON RESTful service return appropriate messages in their JSON bodies
+
+The phase 1 development will be delivered using the existing Java Servlet/JSP framework. This will
+allow the development of integration tests for the JSON-based RESTful service, which will act as
+the initial automated functional specification of a phase 2 reimplementation using Spring Boot.
+
+The delivery of tests and continuous integration are regarded as a necessary feature in order to
+attain a known good state of the system to work from, facilitating test driven development. These
+have therefore been prioritised for delivery in phase 1.
+
+OAuth2 authentication and Containerisation will be more easily delivered using Spring Boot and so
+will be deferred to phase 2.
+
+The decision to implement in Servlet/JSPs was also in part taken due to time constraints as I was
+requested to attempt an initial submission by 12th October and have not developed in Spring Boot or
+container-based architectures before. On reflection, it appears that the effort for delivery of
+RESTful services in Spring Boot may be much less than I anticipated, but my hope is this solution
+demonstrates a number of good practices in terms of:
+1. Separation of Model, View and Controller (MVC) concerns
+2. Application of appropriate software patterns
+3. Exception handling
+4. RESTful service design principles
+5. Testing strategy and test driven development techniques
+
+Code Changes
+============
+
+The code is checked into the public github repository at
+https://github.com/iantmacd/scot.ianmacdonald.cakemgr.webapp
+
+A complete list of commits with their detailed comments can be accessed at
+https://github.com/iantmacd/scot.ianmacdonald.cakemgr.webapp/commits?author=iantmacd
+
+1. Changes to Compile and Run Provided Code
+-------------------------------------------
+
+The directory structure was corrected to place the given classes in the correct packages and allow
+them to compile. The given structure was like a hybrid of a package and java module structure.
+
+A version of the jetty-maven-plugin was provided in the maven pom.xml to remove build warnings and
+reduce potential future problems with unsupported behaviour.
+
+In jetty, the web.xml was preventing reading of Servlet annotations in CakeServlet, so was removed.
+The configuration of maven-war-plugin was updated to make this removal of the web.xml file explicit.
+ 
+2. Implement Requirements with MVC Separation of Concerns
+---------------------------------------------------------
+
+The main package structure was renamed based on my personal domain with packages for model and 
+controller.  The only view component is index.jsp which is located under the standard folder
+/src/main/webapp
+
+2.1 Model
+
+Hibernate annotations were removed from CakeEntity so the only persistence annotations used were
+from the standard Java Persistence API (JPA), which hibernate has supported since version 3.2.
+
+Hibernate sessions were explicitly closed in finally code blocks to prevent the in-memory DB from
+becoming unusable.
+
+The naming of table and columns was corrected in the CakeEntity object, which appeared to have been
+adapted by copy-paste reuse from an earlier employee entity object.
+
+Since the CakeEntity object had been purposefully modified, and declared title as a unique
+constraint field, it was assumed this was a requirement, and that the CAKE DB table represents
+types of cake rather than instances of cake. This would be usual for relational DB storage.
+
+The CakeDao interface was introduced so that clients would not be exposed to the specific DB
+implementation. CakeEntity objects were returned from the interface, and this was considered
+acceptable as hibernate annotations had been removed from this entity, so only standard JPA
+annotations were used.
+
+A CakeDaoFactory utility class was introduced so that clients requiring a CakeDao would obtain it
+without reference to the hibernate-specific implementation class HibernateCakeDao.
+
+DB initialisation code was moved from the controller servlet to HibernateCakeDao as it is hibernate
+specific, and the DAO classes are the information expert classes in the system.
+
+It was assumed that the JSON data source URL was canonical for the application data load. Since it
+contains much duplicated data, it was assumed that the initial load of data into the system had to
+deal with this situation gracefully. CakeDaoConstraintViolationException was introduced as an 
+application-specific RuntimeException. This allowed the initialiser in HibernateCakeDao to ignore
+constraint violations, while clients of the create(CakeEntity) method of CakeDao could chose to
+handle them as error conditions.
+
+Unit test HibernateCakeDaoTest was introduced to test HibernateCakeDao, including initialisation.
+
+Unit test CakeDaoFactoryTest was introduced to test that CakeDaoFactory did not error on
+instantiating a CakeDao, and returned an appropriate implementation of CakeDao.
+
+PojoJsonConverter was introduced to allow conversion of POJOs to JSON strings and vice versa, for
+single objects as well as instances of List. Unit test PojoJsonConverterTest was included to test
+normal function and the throwing of an application-specific RuntimeException when conversion was
+not possible. PojoJsonConverter utility methods were made generic to allow its reuse for returning
+messages as JSON objects.
+
+PojoJsonConverterException was added as an application-specific RuntimeException and used to return
+information to clients when JSON requests could not be parsed by the RESTful web service.
+ 
+2.2 Controller
+
+Annotations were added so that both / and /cakes context paths were handled by CakeServlet.
+
+As per REST principles, read operations were submitted as HTTP GET requests and create operations
+as HTTP POST requests, which would be mapped to the doGet(req, res) and doPost(req, res) methods of
+CakeServlet respectively.  It was decided to retain a single controller servlet, as in this 
+configuration there was some common processing for JSON RESTful service and web application calls.
+
+For both web application and RESTful web service processing, calls to read or create CakeEntity
+objects were delegated to the CakeDao implementation returned from CakeDaoFactory.
+
+In web application processing, the retrieved List<CakeEntity> was associated with a request
+parameter before the request and response were forwarded to index.jsp for rendering.
+
+In RESTful web service processing, the CakeEntity object(s) were translated to JSON using
+PojoJsonConverter before being returned in the HTTP response body.
+
+System error conditions and application-specific RuntimeExceptions were used to determine HTTP
+response codes for the RESTful web service calls, and set these on the HTTP response along with a
+message body containing a JSON message based on the CakeExceptionMessage POJO.
+
+2.3 View
+
+An HTML table was rendered in index.jsp using JSTL tags and the List<CakeEntity> passed as a
+request attribute back to index.jsp for rendering. This allowed a table of all cakes to be
+displayed in a human readable form.
+ 
+A HTTP POST form was introduced in index.jsp to allow the posting of HTTP parameters to CakeServlet
+for marshaling to create a new CakeEntity in the DB via the CakeDao. Appropriate field length
+restrictions were added to the input fields.
+
+Attempt to create cakes in the DB with a duplicate title resulted in a CakeExceptionMessage being
+created as a request attribute. This was then used in index.jsp to render a human-readable error
+message to the client.
+
+3. Overall Function of Application
+----------------------------------
+
+3.1 Integration Tests for RESTful JSON Web Service
+
+End-to-end integration tests of the RESTful web service were implemented using Apache HTTP Client
+in CakeRestServiceIntegrationTest.  The tests were run in a predetermined order using naming
+conventions and the @FixMethodOrder(MethodSorters.NAME_ASCENDING) Junit annotation, so that they
+would run predictably against a freshly initialised instance of the application.
+
+These integration tests were bound to the integration-test and verify goals of the default maven
+build lifecycle using the failsafe plugin.
+
+Goals were added in pre-integration-test to start the application using the jetty-maven-plugin and
+in post-integration-test to stop the application so that the integration tests would run
+predictably from the maven default build lifecycle.
+
+3.2 Exercise of Servlet/JSP Web Application
+
+Functional integration tests could be implemented for the application using Selenium running in
+headless mode.
+
+Time did not allow for this to be implemented, and the integration tests for the RESTful JSON web
+service were prioritised, as these will form the initial automated functional specification for the
+reimplementation of the web service using Spring Boot in phase 2.
+
+The web application can be exercised by visiting http://localhost:8282/
+
+This displays a table of cake objects currently stored in the DB and a form which allows creation
+of a new cake object. Image links in the right hand column navigate to the image URL for any cake.
+
+Entering reasonable values for title, description and image URL and clicking "Create Cake" results
+in creation of a new cake in the DB and its addition to the table.
+
+Entering of values which include a duplicate title for the cake result in error messages stating
+that the cake already exists in the DB.
+
+4. Cloud Continuous Integration Using Github Actions
+----------------------------------------------------
+
+A github action was setup to trigger a build, unit test and integration test of the application
+when commits are pushed to master.
+
+The github action achieves this by running "mvn -B clean verify --file pom.xml"
+
+Running the Web Service/Application
+===================================
+
+The application can be started by running "mvn jetty:run" from the root folder of the project
+(the scot.ianmacdonald.cakemgr.webapp directory, where the pom.xml file is located).
