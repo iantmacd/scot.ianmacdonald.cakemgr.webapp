@@ -52,7 +52,7 @@
 			<version>2.3.4</version>
 		</dependency>
 
-		<!-- Test dependencies. -->
+		<!-- Test dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
