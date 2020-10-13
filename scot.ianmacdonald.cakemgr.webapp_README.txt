@@ -140,7 +140,7 @@ For both web application and RESTful web service processing, calls to read or cr
 objects were delegated to the CakeDao implementation returned from CakeDaoFactory.
 
 In web application processing, the retrieved List<CakeEntity> was associated with a request
-parameter before the request and response were forwarded to index.jsp for rendering.
+attribute before the request and response were forwarded to index.jsp for rendering.
 
 In RESTful web service processing, the CakeEntity object(s) were translated to JSON using
 PojoJsonConverter before being returned in the HTTP response body.

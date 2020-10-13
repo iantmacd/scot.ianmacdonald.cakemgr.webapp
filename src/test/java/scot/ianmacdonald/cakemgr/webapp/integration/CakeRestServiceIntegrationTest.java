@@ -8,7 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.stream.Collectors;
 
+import org.apache.http.Header;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -28,12 +30,15 @@ import org.junit.runners.MethodSorters;
  * in between tests. This is not best practice as ideally each test runs in an
  * idempotent fashion. However, the tests will be launched from maven which will
  * handle starting and stopping the application so the results are predictable.
+ * 
  * @author ian.macdonald@ianmacdonald.scot
  */
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CakeRestServiceIntegrationTest {
 
 	// test data
+
+	// Apache HTTP Client objects
 	private final CloseableHttpClient httpclient = HttpClients.createDefault();
 	private final HttpRequestBase getCakes = new HttpGet("http://localhost:8282/cakes");
 	private final HttpRequestBase postCake = new HttpPost("http://localhost:8282/cakes");
@@ -166,22 +171,29 @@ public class CakeRestServiceIntegrationTest {
 			System.out.println("Request Body:");
 			System.out.println(jsonRequestBody);
 
-			// carry on with setup
+			// carry on with setup for a post request
 			StringEntity entity = new StringEntity(jsonRequestBody);
 			((HttpPost) request).setEntity(entity);
-			request.setHeader("Accept", "application/json");
-			request.setHeader("Content-type", "application/json");
+			request.setHeader("Content-Type", "application/json");
 
 		}
+		
+		// get and post requests both expect response of application/json
+		request.setHeader("Accept", "application/json");
 
 		// Execute the request
-		HttpResponse httpresponse = httpclient.execute(request);
-
-		// get the InputStream to
-		InputStream inputStream = httpresponse.getEntity().getContent();
+		HttpResponse httpResponse = httpclient.execute(request);
 
 		// get the HTTP response code
-		final String actualHttpResponseCode = httpresponse.getStatusLine().toString();
+		final StatusLine httpResponseStatusLine = httpResponse.getStatusLine();
+		final String actualHttpResponseCode = toStingNullSafe(httpResponseStatusLine);
+
+		// get the HTTP response Content-Type header
+		final Header httpResonseContentTypeHeader = httpResponse.getFirstHeader("Content-Type");
+		final String actualHttpResponseContentTypeHeader = toStingNullSafe(httpResonseContentTypeHeader);
+
+		// get the InputStream for the response
+		InputStream inputStream = httpResponse.getEntity().getContent();
 		// convert HTTP response body to a String
 		final String actualJsonResponseBody = new BufferedReader(new InputStreamReader(inputStream)).lines()
 				.collect(Collectors.joining("\n"));
@@ -189,14 +201,29 @@ public class CakeRestServiceIntegrationTest {
 		// output the response code
 		System.out.println("Response Code: " + actualHttpResponseCode);
 
+		// output the response headers
+		System.out.println(actualHttpResponseContentTypeHeader);
+
 		// output the response body
 		System.out.println("Response Body:");
 		System.out.println(actualJsonResponseBody + "\n");
 
 		// assert that the response code had the expected value
-		Assert.assertEquals("The HTTP response code was not as excepted", expectedReponseCode, actualHttpResponseCode);
+		Assert.assertEquals("The HTTP response code was not as expected", expectedReponseCode, actualHttpResponseCode);
+		// assert that the Content-Type header is application/json
+		Assert.assertEquals("The HTTP response Content-Type header was not as expected", "Content-Type: application/json",
+				actualHttpResponseContentTypeHeader);
 		// assert that the response body had the expected value
-		Assert.assertEquals("The HTTP response body was not as excepted", expectedJsonResponse, actualJsonResponseBody);
+		Assert.assertEquals("The HTTP response body was not as expected", expectedJsonResponse, actualJsonResponseBody);
 
+	}
+
+	/**
+	 * Get a String representation of the object in a NullPointerException safe
+	 * manner
+	 */
+	private String toStingNullSafe(final Object object) {
+		final String actualHttpResponseCode = (object == null) ? "" : object.toString();
+		return actualHttpResponseCode;
 	}
 }

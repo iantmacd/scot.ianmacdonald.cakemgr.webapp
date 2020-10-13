@@ -52,6 +52,9 @@ public class CakeServlet extends HttpServlet {
 		if (request.getRequestURI().equals("/cakes")) {
 
 			// RESTful service functions
+			// set the Content-Type response header
+			response.setHeader("Content-Type", "application/json");
+			
 			try {
 
 				response.getWriter().print(PojoJsonConverter.pojoListToJson(list));
@@ -97,12 +100,15 @@ public class CakeServlet extends HttpServlet {
 		if (request.getRequestURI().equals("/cakes")) {
 
 			// RESTful service functions
+			// set the Content-Type response header
+			response.setHeader("Content-Type", "application/json");
+			
 			// read the JSON for the new cake object from the request body
 			String putCakeJsonRequest = null;
 			try {
-
+				
 				putCakeJsonRequest = new BufferedReader(request.getReader()).lines().collect(Collectors.joining("\n"));
-
+				
 			} catch (Exception e) {
 
 				// fatal error while trying to read the request content
